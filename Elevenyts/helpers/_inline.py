@@ -32,28 +32,26 @@ class Inline:
             )
 
         if not remove:
-            # Seek buttons row
-            
-            # Main control buttons row
+            # Seek buttons row - BLUE color for control buttons
             keyboard.append(
                 [
                     self.ikb(
-                        text="▷", callback_data=f"controls resume {chat_id}"),
+                        text="▷", callback_data=f"controls resume {chat_id}", color=types.KeyboardButtonColor.PRIMARY),
                     self.ikb(
-                        text="II", callback_data=f"controls pause {chat_id}"),
+                        text="II", callback_data=f"controls pause {chat_id}", color=types.KeyboardButtonColor.PRIMARY),
                     self.ikb(
-                        text="↻", callback_data=f"controls replay {chat_id}"),
+                        text="↻", callback_data=f"controls replay {chat_id}", color=types.KeyboardButtonColor.PRIMARY),
                     self.ikb(
-                        text="‣‣I", callback_data=f"controls skip {chat_id}"),
+                        text="‣‣I", callback_data=f"controls skip {chat_id}", color=types.KeyboardButtonColor.PRIMARY),
                     self.ikb(
-                        text="▢", callback_data=f"controls stop {chat_id}"),
+                        text="▢", callback_data=f"controls stop {chat_id}", color=types.KeyboardButtonColor.PRIMARY),
                 ]
             )
-            # Delete button as full-width button at bottom
+            # Delete button - RED color
             keyboard.append(
                 [
                     self.ikb(
-                        text="ᴅᴇʟᴇᴛᴇ", callback_data=f"controls close {chat_id}"),
+                        text="ᴅᴇʟᴇᴛᴇ", callback_data=f"controls close {chat_id}", color=types.KeyboardButtonColor.DANGER),
                 ]
             )
         return self.ikm(keyboard)
