@@ -2,7 +2,8 @@ import asyncio
 from pyrogram import enums, errors, filters, types
 
 from Elevenyts import app, config, db, lang
-from Elevenyts.helpers import buttons, utils
+# from Elevenyts.helpers import buttons, utils   # Not needed – removed to avoid circular import
+from Elevenyts.helpers.utils import send_log  # example if needed
 
 # Your custom welcome image (change URL if needed)
 CUSTOM_START_IMG = "https://graph.org/file/your_new_welcome_image.jpg"
