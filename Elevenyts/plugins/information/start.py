@@ -1,11 +1,12 @@
 import asyncio
 from pyrogram import enums, errors, filters, types
+from pyrogram.types import ReactionTypeEmoji
 
 from Elevenyts import app, config, db, lang
 from Elevenyts.helpers import buttons, utils
 
-# You can change this to any image URL (anime, Monkey D. Luffy, etc.)
-CUSTOM_START_IMG = "https://files.catbox.moe/d580rf.jpeg"  # <-- CHANGE THIS URL
+# Your custom welcome image (Monkey D. Luffy themed)
+CUSTOM_START_IMG = "https://files.catbox.moe/d580rf.jpeg"
 
 @app.on_message(filters.command(["help"]) & filters.private & ~app.bl_users)
 @lang.language()
@@ -18,7 +19,7 @@ async def _help(_, m: types.Message):
     
     try:
         await m.reply_photo(
-            photo=CUSTOM_START_IMG,  # Use same custom image for help
+            photo=CUSTOM_START_IMG,
             caption=m.lang["help_menu"],
             reply_markup=buttons.help_markup(m.lang),
             quote=True,
@@ -34,7 +35,10 @@ async def _help(_, m: types.Message):
 @lang.language()
 async def start(_, message: types.Message):
     """
-    Monkey D. Luffy Music Bot – Custom welcome with sticker animation.
+    Monkey D. Luffy Music Bot – Custom welcome with:
+    1. Heart reaction to user's /start message
+    2. Sticker that vanishes after 6 seconds
+    3. Welcome photo + buttons
     """
     # Auto-delete command message in group chats
     if message.chat.type != enums.ChatType.PRIVATE:
@@ -54,9 +58,17 @@ async def start(_, message: types.Message):
 
     private = message.chat.type == enums.ChatType.PRIVATE
 
-    # 🔥 Custom welcome message for Monkey D. Luffy Bot
+    # 🧡 ADD HEART REACTION TO USER'S /start MESSAGE (only in private)
     if private:
-        # Private chat message (includes user's first name)
+        try:
+            await message.react(
+                reaction=ReactionTypeEmoji(emoji="❤️")
+            )
+        except Exception:
+            pass  # Ignore if reaction fails (e.g., bot not admin)
+
+    # Custom welcome message
+    if private:
         _text = (
             f"⚓ **Yo Ho Ho, {message.from_user.first_name}!** ⚓\n\n"
             f"🎵 I'm **Monkey D. Luffy**, your music-playing pirate captain!\n"
@@ -66,7 +78,6 @@ async def start(_, message: types.Message):
             f"👉 **Click the buttons below to add me to your group or visit my channel!**"
         )
     else:
-        # Group chat message (short welcome)
         _text = (
             f"🏴‍☠️ **Monkey D. Luffy** is here!\n"
             f"🎶 Send `/play <song name>` to start the music.\n"
@@ -75,29 +86,27 @@ async def start(_, message: types.Message):
 
     key = buttons.start_key(message.lang, private)
     
-    # 1️⃣ Send sticker first
+    # 1️⃣ Send sticker (vanishes after 6 sec)
     sticker_msg = await message.reply_sticker(
         "CAACAgIAAxkBAAERY5BqLmEBxz9fh5wcpacN1fIEpwdEtwACPUcAAisAAUFK1dzLvSrysQk8BA",
         quote=not private
     )
     
-    # 2️⃣ Wait 6 seconds, then vanish
     await asyncio.sleep(6)
     try:
         await sticker_msg.delete()
     except Exception:
         pass  # Ignore deletion errors
     
-    # 3️⃣ Send welcome photo with custom message
+    # 2️⃣ Send welcome photo with buttons
     try:
         await message.reply_photo(
-            photo=CUSTOM_START_IMG,  # Use your new Luffy-themed image
+            photo=CUSTOM_START_IMG,
             caption=_text,
             reply_markup=key,
             quote=not private,
         )
     except errors.ChatSendPhotosForbidden:
-        # If photos are blocked, send text only
         await message.reply_text(
             text=_text,
             reply_markup=key,
