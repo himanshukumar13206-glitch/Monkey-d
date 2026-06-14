@@ -5,7 +5,7 @@ from Elevenyts import app, config, db, lang
 from Elevenyts.helpers import buttons, utils
 
 # You can change this to any image URL (anime, Monkey D. Luffy, etc.)
-CUSTOM_START_IMG = "https://graph.org/file/your_new_welcome_image.jpg"  # <-- CHANGE THIS URL
+CUSTOM_START_IMG = "https://files.catbox.moe/d580rf.jpeg"  # <-- CHANGE THIS URL
 
 @app.on_message(filters.command(["help"]) & filters.private & ~app.bl_users)
 @lang.language()
