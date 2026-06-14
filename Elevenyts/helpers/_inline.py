@@ -3,7 +3,7 @@
 # All Rights Reserved.
 #
 # Project      : ArtistBots API Telegram Music Bot
-# Powered By   : Artist
+# Powered By   : Avi (modified)
 # Type         : API Based Telegram Music Bot
 #
 # Bot          : @ArtistApibot
@@ -189,7 +189,8 @@ class Inline:
             ],
             [
                 self.ikb(text=lang["help"], callback_data="help", style=ButtonStyle.SUCCESS),
-                self.ikb(text="ꜱᴏᴜʀᴄᴇ", url="https://github.com/elevenyts/ArtistMusic", style=ButtonStyle.SUCCESS),
+                # 🔁 REPLACED "SOURCE" BUTTON WITH "Avi" LINKING TO YOUR TG PROFILE
+                self.ikb(text="Avi", url="https://t.me/Mad_x_Avi", style=ButtonStyle.SUCCESS),
             ],
             [
                 self.ikb(text=lang["support"], url=config.SUPPORT_CHAT, style=ButtonStyle.PRIMARY),
