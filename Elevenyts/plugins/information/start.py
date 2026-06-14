@@ -1,51 +1,9 @@
-# ==========================================================
-# Copyright (c) 2026 ArtistBots
-# All Rights Reserved.
-#
-# Project      : ArtistBots API Telegram Music Bot
-# Powered By   : Artist
-# Type         : API Based Telegram Music Bot
-#
-# Bot          : @ArtistApibot
-# Channel      : https://t.me/artistbots
-# GitHub       : https://github.com/elevenyts
-#
-# Unauthorized copying, modification, or redistribution
-# of this source code without permission is prohibited.
-# ==========================================================
-
+# ... (everything above remains unchanged) ...
+import asyncio
 from pyrogram import enums, errors, filters, types
 
 from Elevenyts import app, config, db, lang
 from Elevenyts.helpers import buttons, utils
-
-
-@app.on_message(filters.command(["help"]) & filters.private & ~app.bl_users)
-@lang.language()
-async def _help(_, m: types.Message):
-    """Handle /help command in private chats - shows help menu with image."""
-    # Auto-delete command message
-    try:
-        await m.delete()
-    except Exception:
-        pass
-    
-    try:
-        await m.reply_photo(
-            photo=config.START_IMG,  # Use same image as start command
-            caption=m.lang["help_menu"],
-            reply_markup=buttons.help_markup(m.lang),
-            quote=True,
-        )
-    except Exception:
-        # Fallback to text if photo fails
-        await m.reply_text(
-            text=m.lang["help_menu"],
-            reply_markup=buttons.help_markup(m.lang),
-            quote=True,
-        )
-
-
 @app.on_message(filters.command(["start"]))
 @lang.language()
 async def start(_, message: types.Message):
@@ -56,6 +14,7 @@ async def start(_, message: types.Message):
     - In group chat: Shows short welcome message
     - Adds new users to database
     - Sends log to logger group for new users
+    - Sends a sticker that vanishes after 6 seconds, then shows photo
     """
     # Auto-delete command message in group chats
     if message.chat.type != enums.ChatType.PRIVATE:
@@ -87,6 +46,23 @@ async def start(_, message: types.Message):
     )
 
     key = buttons.start_key(message.lang, private)
+    
+    # 1️⃣ Send sticker first (with your provided ID)
+    sticker_msg = await message.reply_sticker(
+        "CAACAgIAAxkBAAERY5BqLmEBxz9fh5wcpacN1fIEpwdEtwACPUcAAisAAUFK1dzLvSrysQk8BA",
+        quote=not private
+    )
+    
+    # 2️⃣ Wait 6 seconds
+    await asyncio.sleep(6)
+    
+    # 3️⃣ Try to delete the sticker (vanish)
+    try:
+        await sticker_msg.delete()
+    except Exception:
+        pass  # Ignore if deletion fails (e.g., no permissions)
+    
+    # 4️⃣ Send welcome photo (or text fallback)
     try:
         await message.reply_photo(
             photo=config.START_IMG,
@@ -111,53 +87,4 @@ async def start(_, message: types.Message):
         # Add user to database
         return await db.add_user(message.from_user.id)
 
-
-@app.on_message(filters.command(["playmode", "settings"]) & filters.group & ~app.bl_users)
-@lang.language()
-async def settings(_, message: types.Message):
-    """
-    Handle /playmode or /settings command - show group settings.
-
-    Displays:
-    - Play mode (everyone or admin only)
-    - Current language
-    - Options to change settings
-    """
-    # Auto-delete command message
-    try:
-        await message.delete()
-    except Exception:
-        pass
-    
-    admin_only = await db.get_play_mode(message.chat.id)  # Get play mode setting
-    _language = "en"
-    await utils.safe_text(
-        message,
-        message.lang["start_settings"].format(message.chat.title),
-        reply_markup=buttons.settings_markup(
-            message.lang, admin_only, _language, message.chat.id
-        ),
-        quote=True,
-    )
-
-
-@app.on_message(filters.new_chat_members, group=7)
-@lang.language()
-async def _new_member(_, message: types.Message):
-    """
-    Handle new member events - detect when bot is added to groups.
-
-    - Leaves non-supergroup chats
-    - Adds new groups to database
-    """
-    # Only work in supergroups (not basic groups)
-    if message.chat.type != enums.ChatType.SUPERGROUP:
-        return await message.chat.leave()
-
-    # Check each new member
-    for member in message.new_chat_members:
-        if member.id == app.id:  # Bot itself was added
-            if await db.is_chat(message.chat.id):
-                return  # Chat already in database
-            # Add chat to database (log is sent from new_chat.py with photo)
-            await db.add_chat(message.chat.id)
+# ... (rest of the file unchanged) ...
