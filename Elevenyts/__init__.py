@@ -18,7 +18,38 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 from typing import List
+import logging
+from pyrogram import Client
+from config import API_ID, API_HASH, BOT_TOKEN
 
+# Import your start module components
+from Elevenyts.plugins.start import register_start_handlers, CallbackHandler
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+
+# Create the bot client
+app = Client(
+    "MonkeyDLuffyBot",
+    api_id=API_ID,
+    api_hash=API_HASH,
+    bot_token=BOT_TOKEN,
+    plugins=dict(root="Elevenyts/plugins")   # This loads all plugins automatically
+)
+
+# ========== ADD THE REGISTRATION CODE HERE ==========
+def register_handlers():
+    callback_handler = CallbackHandler()
+    register_start_handlers(app, callback_handler)
+    logging.info("Premium start menu handlers registered")
+
+# Run this after client is created but before app.run()
+register_handlers()
+# ====================================================
+
+if __name__ == "__main__":
+    logging.info("Starting Monkey D Luffy Music Bot...")
+    app.run()   # This starts the bot
 # Configure logging
 logging.basicConfig(
     format="[%(asctime)s - %(levelname)s] - %(name)s: %(message)s",
